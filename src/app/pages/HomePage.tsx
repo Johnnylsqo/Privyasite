@@ -28,12 +28,12 @@ import {
   CheckCircle2,
   UserCheck,
   Lock,
-  Zap
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion } from 'motion/react';
 import { Link } from 'react-router';
-import { Plans } from '../components/Plans';
 import { Values } from '../components/Values';
 import { SocialProof } from '../components/SocialProof';
 import { TrustSection } from '../components/TrustSection';
@@ -41,6 +41,12 @@ import { PopularCategories } from '../components/PopularCategories';
 import { Testimonials } from '../components/Testimonials';
 import { AdvertiserCTA } from '../components/AdvertiserCTA';
 import { FAQ } from '../components/FAQ';
+import OnlineStories from '../components/OnlineStories';
+import AgeVerificationBanner from '../components/AgeVerificationBanner';
+import LanguageSelector from '../components/LanguageSelector';
+import RegisterModal from '../components/RegisterModal';
+import { RecentProfiles, TrendingProfiles, CategoryExplorer, FeaturedMosaic } from '../components/ProfileShowcase';
+import { AutoScrollCarousel } from '../components/AutoScrollCarousel';
 
 // --- MOCK DATA ---
 const vipProfiles = [
@@ -87,37 +93,125 @@ const PrivyaLogo = ({ size = 'default' }: { size?: 'default' | 'small' | 'large'
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  
+  const handleRegistrationSuccess = (userData: any) => {
+    console.log('Cadastro realizado com sucesso:', userData);
+  };
+  
   return (
-    <header className="fixed top-0 inset-x-0 z-[100]" style={{ backdropFilter: 'blur(20px)', background: 'linear-gradient(180deg, rgba(15,15,16,0.92) 0%, rgba(15,15,16,0.75) 100%)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="max-w-[1440px] mx-auto flex items-center justify-between px-6 lg:px-10 h-[72px]">
-        <PrivyaLogo />
-        <nav className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
-          <a href="#" className="relative text-sm text-[#D4AF37] pb-1 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-gradient-to-r after:from-[#D4AF37] after:to-[#F2D77D]" style={{ fontFamily: 'Inter, sans-serif' }}>Início</a>
-          <a href="#" className="text-sm text-white/60 hover:text-white/90 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>Explorar</a>
-          <a href="#" className="text-sm text-white/60 hover:text-white/90 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>Planos</a>
-          <a href="#" className="text-sm text-white/60 hover:text-white/90 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>Como Funciona</a>
-        </nav>
-        <div className="hidden lg:flex items-center gap-3">
-          <button className="px-7 py-2.5 text-sm text-white/90 border border-white/15 rounded-lg hover:bg-white/5 hover:border-white/25 transition-all duration-300">Entrar</button>
-          <button className="px-7 py-2.5 text-sm text-[#0F0F10] rounded-lg transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.35)]" style={{ fontWeight: 600, background: 'linear-gradient(135deg, #F2D77D, #D4AF37, #B8922A)' }}>Registar</button>
-        </div>
-        <button className="lg:hidden text-white/80 hover:text-white" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-      {mobileOpen && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden px-6 py-6 flex flex-col gap-4" style={{ background: 'rgba(15,15,16,0.98)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <a href="#" className="text-[#D4AF37] py-2">Início</a>
-          <a href="#" className="text-white/60 py-2">Explorar</a>
-          <a href="#" className="text-white/60 py-2">Planos</a>
-          <a href="#" className="text-white/60 py-2">Como Funciona</a>
-          <div className="flex gap-3 mt-4">
-            <button className="flex-1 py-3 text-sm text-white border border-white/15 rounded-lg">Entrar</button>
-            <button className="flex-1 py-3 text-sm text-black rounded-lg" style={{ background: 'linear-gradient(135deg, #F2D77D, #D4AF37)' }}>Registar</button>
+    <>
+      <header className="fixed top-0 inset-x-0 z-[100] transition-all duration-500" style={{ 
+        backdropFilter: 'blur(20px)', 
+        background: scrolled 
+          ? 'linear-gradient(180deg, rgba(15,15,16,0.97) 0%, rgba(15,15,16,0.92) 100%)' 
+          : 'linear-gradient(180deg, rgba(15,15,16,0.85) 0%, rgba(15,15,16,0.6) 100%)', 
+        borderBottom: scrolled ? '1px solid rgba(212,175,55,0.08)' : '1px solid rgba(255,255,255,0.04)',
+        boxShadow: scrolled ? '0 4px 30px rgba(0,0,0,0.4)' : 'none',
+      }}>
+        <div className="max-w-[1440px] mx-auto flex items-center justify-between px-5 lg:px-10 h-[64px] lg:h-[68px]">
+          <PrivyaLogo />
+          
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-8 ml-10">
+            {[
+              { label: 'Início', active: true },
+              { label: 'Explorar', active: false },
+              { label: 'Planos', active: false },
+              { label: 'Como Funciona', active: false },
+            ].map((item) => (
+              <a key={item.label} href="#" className={`relative text-[13px] pb-1 transition-colors duration-300 ${item.active ? 'text-[#D4AF37]' : 'text-white/50 hover:text-white/80'}`} style={{ fontFamily: 'Inter, sans-serif', fontWeight: item.active ? 500 : 400 }}>
+                {item.label}
+                {item.active && <span className="absolute bottom-0 left-0 w-full h-[1.5px]" style={{ background: 'linear-gradient(90deg, #D4AF37, #F2D77D)' }} />}
+              </a>
+            ))}
+          </nav>
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-center gap-2.5">
+            <LanguageSelector />
+            <button className="px-5 py-2 text-[13px] text-white/70 hover:text-white border border-white/10 rounded-lg hover:bg-white/5 hover:border-white/20 transition-all duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Entrar
+            </button>
+            <button 
+              onClick={() => setShowRegisterModal(true)}
+              className="px-5 py-2 text-[13px] text-[#0F0F10] rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]" 
+              style={{ fontWeight: 600, background: 'linear-gradient(135deg, #F2D77D, #D4AF37, #B8922A)', fontFamily: 'Inter, sans-serif' }}
+            >
+              Registar
+            </button>
+            <div className="w-[1px] h-6 bg-white/10 mx-1" />
+            <button 
+              className="flex items-center gap-1.5 px-4 py-2 text-[13px] rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,30,63,0.3)]"
+              style={{ 
+                background: 'linear-gradient(135deg, #8B1E3F, #6B1730)', 
+                border: '1px solid rgba(212,175,55,0.2)',
+                color: '#F2D77D',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: 600,
+              }}
+            >
+              <Crown size={14} />
+              Ser Anunciante
+            </button>
           </div>
-        </motion.div>
-      )}
-    </header>
+
+          {/* Mobile Menu Button */}
+          <button className="lg:hidden text-white/80 hover:text-white" onClick={() => setMobileOpen(!mobileOpen)}>
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileOpen && (
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="lg:hidden px-5 py-5 flex flex-col gap-3" style={{ background: 'rgba(15,15,16,0.98)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <a href="#" className="text-[#D4AF37] py-2 text-sm">Início</a>
+            <a href="#" className="text-white/50 py-2 text-sm">Explorar</a>
+            <a href="#" className="text-white/50 py-2 text-sm">Planos</a>
+            <a href="#" className="text-white/50 py-2 text-sm">Como Funciona</a>
+            <div className="pt-3 border-t border-white/10">
+              <LanguageSelector />
+            </div>
+            <div className="flex gap-2.5 mt-3">
+              <button className="flex-1 py-2.5 text-sm text-white border border-white/15 rounded-lg">Entrar</button>
+              <button 
+                onClick={() => setShowRegisterModal(true)}
+                className="flex-1 py-2.5 text-sm text-black rounded-lg" 
+                style={{ background: 'linear-gradient(135deg, #F2D77D, #D4AF37)' }}
+              >
+                Registar
+              </button>
+            </div>
+            {/* Mobile Ser Anunciante */}
+            <button 
+              className="w-full mt-1 py-3 rounded-lg text-sm flex items-center justify-center gap-2 transition-all"
+              style={{ 
+                background: 'linear-gradient(135deg, #8B1E3F, #6B1730)', 
+                border: '1px solid rgba(212,175,55,0.25)',
+                color: '#F2D77D',
+                fontWeight: 600,
+              }}
+            >
+              <Crown size={16} />
+              Ser Anunciante
+            </button>
+          </motion.div>
+        )}
+      </header>
+
+      <RegisterModal 
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onSuccess={handleRegistrationSuccess}
+      />
+    </>
   );
 };
 
@@ -340,7 +434,7 @@ const CitySection = () => (
       {cityCards.map((city, i) => (
         <motion.div key={city.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: i * 0.12 }}
           className="relative rounded-2xl overflow-hidden group cursor-pointer"
-          style={{ aspectRatio: i === 0 ? '16/10' : '4/3', border: '1px solid rgba(139,30,63,0.15)' }}>
+          style={{ aspectRatio: '4/3', border: '1px solid rgba(139,30,63,0.15)' }}>
           <ImageWithFallback src={city.image} alt={city.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(139,30,63,0.5) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 100%)' }} />
           <div className="absolute bottom-0 inset-x-0 p-5">
@@ -400,16 +494,11 @@ const VIPSection = () => (
       </div>
       <a href="#" className="text-sm text-[#D4AF37] hover:text-[#F2D77D] transition-colors flex items-center gap-1">Ver Todas <ChevronRight size={14} /></a>
     </div>
-    <div className="flex overflow-x-auto gap-5 pb-6 hide-scrollbar snap-x snap-mandatory">
+    <AutoScrollCarousel speed={0.3} gap="gap-5">
       {vipProfiles.map((profile, index) => (
         <div key={profile.id} className="snap-start"><VIPCard profile={profile} index={index} /></div>
       ))}
-      <div className="w-[60px] shrink-0 flex items-center justify-center">
-        <div className="w-11 h-11 rounded-full flex items-center justify-center text-white/30 hover:text-[#D4AF37] hover:border-[#8B1E3F] transition-all cursor-pointer" style={{ border: '1px solid rgba(139,30,63,0.2)' }}>
-          <ChevronRight size={20} />
-        </div>
-      </div>
-    </div>
+    </AutoScrollCarousel>
   </section>
 );
 
@@ -581,6 +670,82 @@ const Benefits = () => {
   );
 };
 
+const MidPageCTA = () => (
+  <section className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-10 py-10">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+      className="relative rounded-2xl overflow-hidden p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-8"
+      style={{ 
+        background: 'linear-gradient(135deg, rgba(31,31,33,0.7) 0%, rgba(139,30,63,0.15) 50%, rgba(31,31,33,0.7) 100%)', 
+        border: '1px solid rgba(139,30,63,0.25)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+      }}>
+      <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%)' }} />
+      <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(139,30,63,0.15) 0%, transparent 70%)' }} />
+      
+      <div className="relative z-10 flex-1">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles size={16} className="text-[#D4AF37]" />
+          <span className="text-[11px] text-[#D4AF37] uppercase tracking-widest" style={{ fontWeight: 600 }}>Experiência Premium</span>
+        </div>
+        <h3 className="text-2xl lg:text-3xl text-white mb-2" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400 }}>
+          Pronta para começar a sua <span className="italic" style={{ color: '#D4AF37' }}>jornada?</span>
+        </h3>
+        <p className="text-sm text-white/45 max-w-lg" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+          Registe-se gratuitamente e descubra perfis exclusivos em toda Portugal. Discrição e segurança garantidas.
+        </p>
+      </div>
+      
+      <div className="relative z-10 flex flex-col sm:flex-row gap-3">
+        <button className="px-8 py-3.5 text-sm text-[#0F0F10] rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.35)] flex items-center gap-2"
+          style={{ fontWeight: 600, background: 'linear-gradient(135deg, #F2D77D, #D4AF37, #B8922A)', fontFamily: 'Inter, sans-serif' }}>
+          Criar Conta Grátis
+          <ArrowRight size={16} />
+        </button>
+        <button className="px-8 py-3.5 text-sm text-white/80 rounded-xl transition-all duration-300 hover:bg-white/5 flex items-center gap-2"
+          style={{ fontFamily: 'Inter, sans-serif', border: '1px solid rgba(255,255,255,0.15)' }}>
+          <Search size={14} />
+          Explorar Perfis
+        </button>
+      </div>
+    </motion.div>
+  </section>
+);
+
+const FloatingAdvertiserButton = () => {
+  const [visible, setVisible] = useState(false);
+  
+  React.useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.8, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.8, y: 20 }}
+      className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 px-5 py-3 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(139,30,63,0.4)]"
+      style={{
+        background: 'linear-gradient(135deg, #8B1E3F, #6B1730)',
+        border: '1px solid rgba(212,175,55,0.3)',
+        boxShadow: '0 8px 30px rgba(139,30,63,0.4), 0 0 60px rgba(139,30,63,0.15)',
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: 600,
+        color: '#F2D77D',
+      }}
+    >
+      <Crown size={18} />
+      <span className="text-sm hidden sm:inline">Ser Anunciante</span>
+      <span className="text-sm sm:hidden">Anunciar</span>
+    </motion.button>
+  );
+};
+
 const Footer = () => (
   <footer className="relative z-10 mt-4" style={{ borderTop: '1px solid rgba(139,30,63,0.15)' }}>
     <div className="h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #8B1E3F, #D4AF37, #8B1E3F, transparent)' }} />
@@ -634,44 +799,57 @@ export default function HomePage() {
       `}} />
       <div className="min-h-screen bg-[#0F0F10] text-white selection:bg-[#8B1E3F]/40 selection:text-white relative overflow-x-hidden" style={{ fontFamily: 'Inter, sans-serif' }}>
         <Header />
+        
+        {/* Age Verification Banner */}
+        <AgeVerificationBanner />
+        
         <main>
           {/* 1. Hero com busca */}
           <Hero />
           
-          {/* 2. Selos de confiança (embutidos no Hero - Trust badges) */}
+          {/* Online Stories */}
+          <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-10 pt-8">
+            <OnlineStories />
+          </div>
           
-          {/* 3. Bloco de prova social */}
+          {/* Bloco de prova social */}
           <SocialProof />
           <WineDivider />
           
-          {/* 4. Perfis em destaque */}
+          {/* Perfis VIP em destaque */}
           <VIPSection />
           <WineDivider />
-          
-          {/* 5. Explorar por cidade */}
-          <CitySection />
+
+          {/* Perfis Recentes */}
+          <RecentProfiles />
           <WineDivider />
           
-          {/* 6. Como funciona */}
+          {/* Explorar por cidade */}
+          <CitySection />
+          
+          {/* Mid-page CTA */}
+          <MidPageCTA />
+          <WineDivider />
+          
+          {/* Como funciona */}
           <HowItWorks />
           <WineDivider />
           
-          {/* 7. Segurança e verificação */}
+          {/* Explorar por Categoria */}
+          <CategoryExplorer />
+          <WineDivider />
+          
+          {/* Segurança e verificação */}
           <TrustSection />
           <WineDivider />
           
-          {/* 8. Categorias populares */}
-          <PopularCategories />
-          <WineDivider />
-          
-          {/* 9. Avaliações/depoimentos */}
+          {/* Avaliações/depoimentos */}
           <Testimonials />
           
-          {/* 10. CTA para anunciantes */}
+          {/* CTA para anunciantes */}
           <AdvertiserCTA />
           <WineDivider />
           
-          {/* 11. Planos/destaques (já incluído em AdvertiserCTA) */}
           {/* Valores da empresa */}
           <Values />
           <WineDivider />
@@ -680,7 +858,7 @@ export default function HomePage() {
           <Benefits />
           <WineDivider />
           
-          {/* 12. FAQ */}
+          {/* FAQ */}
           <FAQ />
         </main>
         <Footer />

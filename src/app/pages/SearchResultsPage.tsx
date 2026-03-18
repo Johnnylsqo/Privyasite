@@ -12,9 +12,15 @@ import {
   BadgeCheck,
   Zap,
   TrendingUp,
+  Heart,
+  User,
+  LogOut,
+  Settings,
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion, AnimatePresence } from 'motion/react';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from '../components/LoginModal';
 
 // Mock data - Perfis com alguns patrocinados
 const profiles = [
@@ -27,7 +33,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1765229279946-f265fa703385?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjB3b21hbiUyMHJlZCUyMGRyZXNzJTIwZ2xhbW91cnxlbnwxfHx8fDE3NzM2MTk4NDV8MA&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.9,
     reviewsCount: 156,
-    price: '180€',
     isVIP: true,
     isSponsored: true,
     verified: true,
@@ -43,7 +48,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1710023209229-ec9877bbb95b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb3BoaXN0aWNhdGVkJTIwd29tYW4lMjBldmVuaW5nJTIwZ293bnxlbnwxfHx8fDE3NzM2MTk4NDR8MA&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.8,
     reviewsCount: 98,
-    price: '150€',
     isVIP: true,
     isSponsored: true,
     verified: true,
@@ -59,7 +63,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1757607715843-35349ddda681?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwd29tYW4lMjBicm93biUyMGhhaXIlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzM2MTYyMDZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.9,
     reviewsCount: 127,
-    price: '150€',
     isVIP: true,
     isSponsored: false,
     verified: true,
@@ -75,7 +78,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1772987292949-4b1bdc01a612?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjB3b21hbiUyMGVsZWdhbnQlMjBwb3J0cmFpdCUyMGJsYWNrfGVufDF8fHx8MTc3MzYxOTg0NXww&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.7,
     reviewsCount: 89,
-    price: '140€',
     isVIP: false,
     isSponsored: false,
     verified: true,
@@ -91,7 +93,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1764305066080-4eb1823d72ca?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnbGFtb3JvdXMlMjB3b21hbiUyMGdvbGQlMjBqZXdlbHJ5fGVufDF8fHx8MTc3MzYxOTg0Nnww&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.6,
     reviewsCount: 67,
-    price: '130€',
     isVIP: false,
     isSponsored: false,
     verified: true,
@@ -107,7 +108,6 @@ const profiles = [
     image: 'https://images.unsplash.com/photo-1678723357379-d87f2a0ec8ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb3BoaXN0aWNhdGVkJTIwd29tYW4lMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzMyNzkzNzh8MA&ixlib=rb-4.1.0&q=80&w=1080',
     rating: 4.8,
     reviewsCount: 112,
-    price: '160€',
     isVIP: true,
     isSponsored: false,
     verified: true,
@@ -159,18 +159,74 @@ const BokehParticle = ({ delay, x, y, size, opacity }: { delay: number; x: strin
 
 export default function SearchResultsPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const cityParam = searchParams.get('city') || 'Lisboa';
+  const { user, isAuthenticated, logout } = useAuth();
   
   const [showFilters, setShowFilters] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState(cityParam);
-  const [priceRange, setPriceRange] = useState<[number, number]>([100, 300]);
   const [onlyVIP, setOnlyVIP] = useState(false);
   const [onlyOnline, setOnlyOnline] = useState(false);
 
+  // Filter logic
+  const getFilteredProfiles = () => {
+    let filtered = [...profiles];
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(profile => 
+        profile.name.toLowerCase().includes(query) ||
+        profile.city.toLowerCase().includes(query) ||
+        profile.district.toLowerCase().includes(query) ||
+        profile.services.some(service => service.toLowerCase().includes(query))
+      );
+    }
+
+    // Filter by city
+    if (selectedCity && selectedCity !== 'Todas') {
+      filtered = filtered.filter(profile => profile.city === selectedCity);
+    }
+
+    // Filter VIP only
+    if (onlyVIP) {
+      filtered = filtered.filter(profile => profile.isVIP);
+    }
+
+    // Filter online only
+    if (onlyOnline) {
+      filtered = filtered.filter(profile => profile.isOnline);
+    }
+
+    return filtered;
+  };
+
+  const filteredProfiles = getFilteredProfiles();
+
   // Separar perfis patrocinados e normais
-  const sponsoredProfiles = profiles.filter(p => p.isSponsored);
-  const regularProfiles = profiles.filter(p => !p.isSponsored);
+  const sponsoredProfiles = filteredProfiles.filter(p => p.isSponsored);
+  const regularProfiles = filteredProfiles.filter(p => !p.isSponsored);
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCity('Lisboa');
+    setOnlyVIP(false);
+    setOnlyOnline(false);
+  };
+
+  // Update URL when city changes
+  const handleCityChange = (city: string) => {
+    setSelectedCity(city);
+    if (city !== 'Todas') {
+      setSearchParams({ city });
+    } else {
+      setSearchParams({});
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0F0F10] text-white relative overflow-x-hidden" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -204,6 +260,8 @@ export default function SearchResultsPage() {
                     background: 'linear-gradient(135deg, rgba(31,31,33,0.6) 0%, rgba(26,26,28,0.4) 100%)',
                     border: '1px solid rgba(139,30,63,0.2)',
                   }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
@@ -239,40 +297,20 @@ export default function SearchResultsPage() {
                 </h3>
                 <select 
                   value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
+                  onChange={(e) => handleCityChange(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg text-sm text-white outline-none"
                   style={{ 
                     background: 'rgba(139,30,63,0.1)',
                     border: '1px solid rgba(139,30,63,0.2)',
                   }}
                 >
+                  <option value="Todas">Todas</option>
                   <option value="Lisboa">Lisboa</option>
                   <option value="Porto">Porto</option>
                   <option value="Faro">Faro</option>
                   <option value="Coimbra">Coimbra</option>
                   <option value="Braga">Braga</option>
                 </select>
-              </div>
-
-              {/* Price Range */}
-              <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(31,31,33,0.6) 0%, rgba(26,26,28,0.4) 100%)', border: '1px solid rgba(139,30,63,0.15)' }}>
-                <h3 className="text-base text-white mb-4" style={{ fontWeight: 600 }}>
-                  Faixa de Preço
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/60">Mín: {priceRange[0]}€</span>
-                    <span className="text-white/60">Máx: {priceRange[1]}€</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="50" 
-                    max="500" 
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full"
-                  />
-                </div>
               </div>
 
               {/* Quick Filters */}
@@ -309,7 +347,7 @@ export default function SearchResultsPage() {
               </div>
 
               {/* Clear Filters */}
-              <button className="w-full py-2.5 rounded-xl text-sm text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all">
+              <button className="w-full py-2.5 rounded-xl text-sm text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all" onClick={handleClearFilters}>
                 Limpar Filtros
               </button>
             </div>
@@ -324,7 +362,7 @@ export default function SearchResultsPage() {
                 Acompanhantes em <span className="italic" style={{ color: '#D4AF37' }}>{selectedCity}</span>
               </h1>
               <p className="text-sm text-white/50">
-                {profiles.length} perfis encontrados
+                {filteredProfiles.length} perfis encontrados
               </p>
             </div>
 
@@ -431,12 +469,8 @@ export default function SearchResultsPage() {
                             </div>
                           </div>
 
-                          {/* Price */}
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="text-2xl text-[#D4AF37]" style={{ fontWeight: 700 }}>{profile.price}</span>
-                              <span className="text-sm text-white/40 ml-1">/ hora</span>
-                            </div>
+                          {/* CTA Button */}
+                          <div className="flex items-center justify-end">
                             <button className="px-5 py-2 rounded-lg text-sm text-white transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                               style={{ 
                                 background: 'linear-gradient(135deg, #D4AF37, #B8922A)',
@@ -525,10 +559,6 @@ export default function SearchResultsPage() {
                             <span className="text-sm text-[#D4AF37]" style={{ fontWeight: 600 }}>{profile.rating}</span>
                             <span className="text-xs text-white/50">({profile.reviewsCount})</span>
                           </div>
-                          <div>
-                            <span className="text-lg text-[#D4AF37]" style={{ fontWeight: 700 }}>{profile.price}</span>
-                            <span className="text-xs text-white/50">/h</span>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -581,13 +611,117 @@ export default function SearchResultsPage() {
 
                 {/* Mobile filters content - same as desktop */}
                 <div className="space-y-6">
-                  {/* Add same filter sections as desktop sidebar */}
+                  {/* City Filter */}
+                  <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(31,31,33,0.6) 0%, rgba(26,26,28,0.4) 100%)', border: '1px solid rgba(139,30,63,0.15)' }}>
+                    <h3 className="text-base text-white mb-4 flex items-center gap-2" style={{ fontWeight: 600 }}>
+                      <MapPin size={16} className="text-[#D4AF37]" />
+                      Cidade
+                    </h3>
+                    <select 
+                      value={selectedCity}
+                      onChange={(e) => handleCityChange(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg text-sm text-white outline-none"
+                      style={{ 
+                        background: 'rgba(139,30,63,0.1)',
+                        border: '1px solid rgba(139,30,63,0.2)',
+                      }}
+                    >
+                      <option value="Todas">Todas</option>
+                      <option value="Lisboa">Lisboa</option>
+                      <option value="Porto">Porto</option>
+                      <option value="Faro">Faro</option>
+                      <option value="Coimbra">Coimbra</option>
+                      <option value="Braga">Braga</option>
+                    </select>
+                  </div>
+
+                  {/* Quick Filters */}
+                  <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(31,31,33,0.6) 0%, rgba(26,26,28,0.4) 100%)', border: '1px solid rgba(139,30,63,0.15)' }}>
+                    <h3 className="text-base text-white mb-4" style={{ fontWeight: 600 }}>
+                      Filtros Rápidos
+                    </h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input 
+                          type="checkbox" 
+                          checked={onlyVIP}
+                          onChange={(e) => setOnlyVIP(e.target.checked)}
+                          className="w-4 h-4 rounded border-2 border-[#D4AF37]/30 bg-transparent checked:bg-[#D4AF37]"
+                        />
+                        <span className="text-sm text-white/70 group-hover:text-white transition-colors flex items-center gap-2">
+                          <Crown size={14} className="text-[#D4AF37]" />
+                          Apenas VIP
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <input 
+                          type="checkbox"
+                          checked={onlyOnline}
+                          onChange={(e) => setOnlyOnline(e.target.checked)}
+                          className="w-4 h-4 rounded border-2 border-emerald-400/30 bg-transparent checked:bg-emerald-400"
+                        />
+                        <span className="text-sm text-white/70 group-hover:text-white transition-colors flex items-center gap-2">
+                          <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+                          Apenas Online
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Clear Filters */}
+                  <button className="w-full py-2.5 rounded-xl text-sm text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all" onClick={handleClearFilters}>
+                    Limpar Filtros
+                  </button>
+
+                  {/* Apply and Close */}
+                  <button 
+                    className="w-full py-3 rounded-xl text-sm text-white transition-all"
+                    style={{ background: 'linear-gradient(135deg, #8B1E3F, #6B1730)', fontWeight: 600 }}
+                    onClick={() => setShowFilters(false)}
+                  >
+                    Aplicar Filtros
+                  </button>
                 </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Login Modal */}
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+
+      {/* User Menu */}
+      {isAuthenticated && (
+        <div className="fixed bottom-4 right-4 z-[120]">
+          <button
+            className="p-3 rounded-full bg-[#0F0F10] shadow-lg"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+          >
+            <User size={20} className="text-white" />
+          </button>
+          {showUserMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="absolute right-0 bottom-14 w-48 bg-[#0F0F10] shadow-lg rounded-lg"
+            >
+              <div className="p-2">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
+                  <Settings size={16} className="text-white" />
+                  <span className="text-sm text-white">Configurações</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800">
+                  <LogOut size={16} className="text-white" />
+                  <span className="text-sm text-white" onClick={logout}>Sair</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -24,9 +24,11 @@ import {
   Video,
   Image as ImageIcon,
   TrendingUp,
+  Flag,
 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { motion, AnimatePresence } from 'motion/react';
+import ReportModal from '../components/ReportModal';
 
 // Serviços com descrições detalhadas
 const servicesDatabase = {
@@ -202,6 +204,7 @@ export default function ProfilePage() {
   const [expandedImage, setExpandedImage] = useState<number | null>(null);
   const [expandedService, setExpandedService] = useState<string | null>(null);
   const [galleryTab, setGalleryTab] = useState<'photos' | 'videos'>('photos');
+  const [showReportModal, setShowReportModal] = useState(false);
 
   // Combine photos and videos for modal navigation
   const allMedia = [...profileData.photos, ...profileData.videos];
@@ -257,16 +260,14 @@ export default function ProfilePage() {
       {/* Mobile Floating Contact Bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-[90]" style={{ backdropFilter: 'blur(20px)', background: 'linear-gradient(180deg, rgba(15,15,16,0.85) 0%, rgba(15,15,16,0.95) 100%)', borderTop: '1px solid rgba(139,30,63,0.2)' }}>
         <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               <h3 className="text-sm text-white truncate" style={{ fontWeight: 600 }}>
                 {profileData.name}
               </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-base text-[#D4AF37]" style={{ fontWeight: 700 }}>
-                  {profileData.prices['1h']}
-                </span>
-                <span className="text-xs text-white/40">/ hora</span>
+              <div className="flex items-center gap-1">
+                <Star size={12} className="text-[#D4AF37] fill-[#D4AF37]" />
+                <span className="text-xs text-white/60">{profileData.rating}</span>
               </div>
             </div>
             <button 
@@ -274,7 +275,7 @@ export default function ProfilePage() {
               style={{ background: 'linear-gradient(135deg, #8B1E3F, #6B1730)', fontWeight: 600 }}
             >
               <Phone size={16} />
-              Ver Telefone
+              Ver Contato
             </button>
           </div>
         </div>
@@ -846,10 +847,27 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </section>
+
+              {/* Denunciar Perfil */}
+              <button
+                onClick={() => setShowReportModal(true)}
+                className="w-full rounded-2xl p-4 flex items-center justify-center gap-2 text-sm text-white/60 hover:text-white transition-all hover:bg-white/5"
+                style={{ border: '1px solid rgba(139,30,63,0.15)' }}
+              >
+                <Flag size={16} />
+                Denunciar Perfil
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        profileName={profileData.name}
+      />
     </div>
   );
 }

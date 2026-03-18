@@ -1,45 +1,63 @@
 import { motion } from 'motion/react';
-import { Crown, TrendingUp, Target, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Crown, TrendingUp, Target, Zap, ArrowRight, Shield, Eye, BarChart3, Clock, Users, BadgeCheck, Sparkles, Camera, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router';
 
 export const AdvertiserCTA = () => {
-  const benefits = [
-    { icon: <TrendingUp size={20} />, text: 'Maior visibilidade' },
-    { icon: <Target size={20} />, text: 'Destaque por cidade' },
-    { icon: <Crown size={20} />, text: 'Destaque na home' },
-    { icon: <Zap size={20} />, text: 'Perfil premium' },
-  ];
-
-  const plans = [
-    {
-      name: 'Destaque 24h',
-      price: '25€',
-      features: ['Posição de destaque por 24h', 'Badge destaque', 'Até 3x mais visualizações'],
+  const features = [
+    { 
+      icon: <Eye size={24} />, 
+      title: 'Máxima Visibilidade', 
+      desc: 'O seu perfil é exibido para milhares de utilizadores diariamente em toda Portugal.',
+      highlight: false,
     },
-    {
-      name: 'Topo da Cidade',
-      price: '80€/semana',
-      features: ['Sempre no topo da sua cidade', 'Badge VIP dourado', 'Até 5x mais visualizações'],
-      popular: true,
+    { 
+      icon: <BadgeCheck size={24} />, 
+      title: 'Perfil Verificado', 
+      desc: 'Selo de verificação que transmite confiança e credibilidade aos clientes.',
+      highlight: false,
     },
-    {
-      name: 'Destaque Home',
-      price: '150€/semana',
-      features: ['Destaque na página inicial', 'Badge Premium', 'Até 10x mais visualizações'],
+    { 
+      icon: <BarChart3 size={24} />, 
+      title: 'Estatísticas Detalhadas', 
+      desc: 'Acompanhe visualizações, contactos e desempenho do seu perfil em tempo real.',
+      highlight: false,
+    },
+    { 
+      icon: <Crown size={24} />, 
+      title: 'Destaque VIP', 
+      desc: 'Posicione-se no topo dos resultados com os nossos planos de destaque premium.',
+      highlight: true,
+    },
+    { 
+      icon: <Camera size={24} />, 
+      title: 'Galeria Profissional', 
+      desc: 'Publique até 20 fotos em alta qualidade no seu perfil para atrair mais clientes.',
+      highlight: false,
+    },
+    { 
+      icon: <ShieldCheck size={24} />, 
+      title: 'Ambiente Seguro', 
+      desc: 'Proteção total dos seus dados pessoais e ferramentas de bloqueio e denúncia.',
+      highlight: false,
+    },
+    { 
+      icon: <Target size={24} />, 
+      title: 'Destaque por Cidade', 
+      desc: 'Apareça em destaque na sua cidade de atendimento para clientes locais.',
+      highlight: false,
+    },
+    { 
+      icon: <Clock size={24} />, 
+      title: 'Suporte Dedicado', 
+      desc: 'Equipa de suporte exclusiva para anunciantes com resposta em até 2 horas.',
+      highlight: false,
     },
   ];
 
   return (
     <section className="relative z-10 py-20 lg:py-24 overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background */}
       <div className="absolute inset-0 z-0">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: 'url(https://images.unsplash.com/photo-1750841896972-7e78c4ba21d2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwZ29sZCUyMHdpbmUlMjB0ZXh0dXJlJTIwYWJzdHJhY3R8ZW58MXx8fHwxNzczNjE5MTY5fDA&ixlib=rb-4.1.0&q=80&w=1080)',
-            filter: 'blur(2px)',
-            opacity: 0.08
-          }}
-        />
         <div className="absolute inset-0" style={{ 
           background: 'linear-gradient(135deg, #8B1E3F 0%, #6B1730 30%, #4A0F20 60%, #2D0913 100%)',
         }} />
@@ -54,7 +72,7 @@ export const AdvertiserCTA = () => {
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 relative z-10">
         
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-14">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -75,139 +93,124 @@ export const AdvertiserCTA = () => {
             className="text-3xl lg:text-5xl text-white mb-4" 
             style={{ fontFamily: 'Playfair Display, serif', fontWeight: 400 }}
           >
-            Quer <span className="italic" style={{ color: '#D4AF37' }}>Promover</span> o seu Perfil?
+            Porque anunciar na <span className="italic" style={{ color: '#D4AF37' }}>PRIVYA?</span>
           </motion.h2>
 
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-base lg:text-lg text-white/60 max-w-2xl mx-auto mb-8"
+            className="text-base lg:text-lg text-white/60 max-w-2xl mx-auto"
           >
-            Destaque-se da concorrência e aumente significativamente as suas reservas com os nossos planos premium
+            A plataforma premium que oferece as melhores ferramentas para destacar o seu perfil e alcançar clientes de alto padrão
           </motion.p>
-
-          {/* Benefits Pills */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap items-center justify-center gap-3 mb-12"
-          >
-            {benefits.map((benefit, i) => (
-              <div 
-                key={i}
-                className="flex items-center gap-2 px-4 py-2 rounded-full"
-                style={{ background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)' }}
-              >
-                <span className="text-[#D4AF37]">{benefit.icon}</span>
-                <span className="text-sm text-white/80">{benefit.text}</span>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
-        {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {plans.map((plan, i) => (
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
+          {features.map((feature, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 + i * 0.1 }}
-              className="relative rounded-2xl p-8 group hover:-translate-y-2 transition-all duration-300"
+              transition={{ duration: 0.5, delay: 0.3 + i * 0.07 }}
+              className="relative rounded-2xl p-6 group hover:-translate-y-1 transition-all duration-300 overflow-hidden"
               style={{
-                background: plan.popular 
+                background: feature.highlight 
                   ? 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(139,30,63,0.2) 100%)'
-                  : 'linear-gradient(135deg, rgba(31,31,33,0.8) 0%, rgba(26,26,28,0.6) 100%)',
-                border: plan.popular 
-                  ? '2px solid rgba(212,175,55,0.4)'
-                  : '1px solid rgba(139,30,63,0.3)',
-                boxShadow: plan.popular 
-                  ? '0 10px 40px rgba(212,175,55,0.2)'
-                  : '0 8px 30px rgba(0,0,0,0.3)',
+                  : 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+                border: feature.highlight 
+                  ? '1px solid rgba(212,175,55,0.35)'
+                  : '1px solid rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(10px)',
               }}
             >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <div 
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs uppercase tracking-wider"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #F2D77D, #D4AF37)',
-                    color: '#0F0F10',
-                    fontWeight: 700,
-                  }}
-                >
-                  Mais Popular
+              {feature.highlight && (
+                <div className="absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[9px] text-[#0F0F10] uppercase tracking-wider"
+                  style={{ background: 'linear-gradient(135deg, #F2D77D, #D4AF37)', fontWeight: 700 }}>
+                  Popular
                 </div>
               )}
-
-              <div className="text-center mb-6">
-                <h3 className="text-xl text-white mb-3" style={{ fontFamily: 'Playfair Display, serif', fontWeight: 500 }}>
-                  {plan.name}
-                </h3>
-                <div className="flex items-baseline justify-center gap-1 mb-2">
-                  <span className="text-4xl text-[#D4AF37]" style={{ fontWeight: 700 }}>
-                    {plan.price.split('/')[0]}
-                  </span>
-                  {plan.price.includes('/') && (
-                    <span className="text-sm text-white/50">
-                      /{plan.price.split('/')[1]}
-                    </span>
-                  )}
-                </div>
+              
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" 
+                style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.08) 0%, transparent 60%)' }} />
+              
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-[#D4AF37] mb-4 relative z-10"
+                style={{ background: 'rgba(212,175,55,0.1)', border: '1px solid rgba(212,175,55,0.2)' }}>
+                {feature.icon}
               </div>
-
-              <div className="space-y-3 mb-8">
-                {plan.features.map((feature, fi) => (
-                  <div key={fi} className="flex items-start gap-3">
-                    <CheckCircle2 size={16} className="text-[#D4AF37] shrink-0 mt-0.5" />
-                    <span className="text-sm text-white/70">{feature}</span>
-                  </div>
-                ))}
-              </div>
-
-              <button 
-                className="w-full py-3 rounded-xl text-sm transition-all duration-300 flex items-center justify-center gap-2 group-hover:gap-3"
-                style={{
-                  background: plan.popular 
-                    ? 'linear-gradient(135deg, #F2D77D, #D4AF37)'
-                    : 'rgba(212,175,55,0.1)',
-                  color: plan.popular ? '#0F0F10' : '#D4AF37',
-                  border: plan.popular ? 'none' : '1px solid rgba(212,175,55,0.3)',
-                  fontWeight: 600,
-                }}
-              >
-                Escolher Plano
-                <ArrowRight size={16} className="transition-transform" />
-              </button>
+              
+              <h3 className="text-base text-white mb-2 relative z-10" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+                {feature.title}
+              </h3>
+              
+              <p className="text-xs text-white/50 leading-relaxed relative z-10" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>
+                {feature.desc}
+              </p>
             </motion.div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
+        {/* Approval Notice */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="rounded-xl p-5 mb-10 flex items-start gap-4 max-w-3xl mx-auto"
+          style={{ 
+            background: 'rgba(212,175,55,0.06)', 
+            border: '1px solid rgba(212,175,55,0.15)',
+          }}
+        >
+          <Shield size={20} className="text-[#D4AF37] shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm text-white/80 mb-1" style={{ fontWeight: 600 }}>
+              Cadastro sujeito a aprovação
+            </p>
+            <p className="text-xs text-white/50 leading-relaxed">
+              Todos os cadastros de anunciantes passam por uma análise criteriosa da nossa equipa. 
+              Todo conteúdo enviado (fotos, descrições e documentos) é verificado antes da publicação 
+              para garantir a qualidade e segurança da plataforma.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Bottom CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
           className="text-center"
         >
-          <p className="text-sm text-white/50 mb-6">
-            Ainda não tem perfil na PRIVYA?
-          </p>
-          <button 
-            className="px-10 py-4 rounded-xl text-base transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] inline-flex items-center gap-3"
-            style={{
-              background: 'linear-gradient(135deg, #F2D77D, #D4AF37, #B8922A)',
-              color: '#0F0F10',
-              fontWeight: 700,
-            }}
-          >
-            Criar Perfil Grátis
-            <ArrowRight size={20} />
-          </button>
-          <p className="text-xs text-white/40 mt-4">
-            Registo 100% gratuito • Aprovação em até 24h
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+            <button 
+              className="px-10 py-4 rounded-xl text-base transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] inline-flex items-center gap-3"
+              style={{
+                background: 'linear-gradient(135deg, #F2D77D, #D4AF37, #B8922A)',
+                color: '#0F0F10',
+                fontWeight: 700,
+              }}
+            >
+              Criar Perfil Grátis
+              <ArrowRight size={20} />
+            </button>
+            
+            <Link 
+              to="/planos"
+              className="px-10 py-4 rounded-xl text-base transition-all duration-300 hover:bg-white/5 inline-flex items-center gap-3"
+              style={{
+                border: '1px solid rgba(212,175,55,0.3)',
+                color: '#D4AF37',
+                fontWeight: 600,
+              }}
+            >
+              <Sparkles size={18} />
+              Ver Planos e Preços
+            </Link>
+          </div>
+          
+          <p className="text-xs text-white/40">
+            Registo 100% gratuito · Aprovação em até 24h · Todo conteúdo é moderado
           </p>
         </motion.div>
       </div>
